@@ -9,7 +9,9 @@ class App extends React.Component {
     this.state={
       searchQuery:'',
       location: {},
-      weather: ''
+      weather: '',
+      lat: '',
+      lon: '',
     }
   }
   updateSearch = (e) => {
@@ -21,17 +23,16 @@ class App extends React.Component {
     const locQuery = `https://us1.locationiq.com/v1/search.php?key=pk.ef3d54655e3320d15cda54e644219efe&q=${this.state.searchQuery}&format=json`;
     const res = await axios.get(locQuery);
     console.log(res);
-    this.setState({ location:res.data[0] });
+    this.setState({ location:res.data[0], lon: res.data[0].lon, lat: res.data[0].lat });
   }
   getWeather = async (e) => {
-    // e.preventDefault();
-    this.getLocation();
-
+    console.log(this.state.lon);
     try {
+      await this.getLocation(); // await the function that needs to run first
       const API = 'http://localhost:3003';
-      const weather = await axios.get(`${API}/weather`, { params: { lat: this.state.location.lat, lon: this.state.location.lon }});
+      const weather = await axios.get(`${API}/weather`, { params: { lat: this.state.lat, lon: this.state.lon }});
       console.log(weather)
-      this.setState({ weather: {day1: weather.data[0].weather.description} });
+      this.setState({ weather: {day1: weather.data.weather.description} });
 
     } catch(err) {
       console.error(err);
